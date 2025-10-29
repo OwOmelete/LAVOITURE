@@ -777,25 +777,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KartController
   sphere: {fileID: 1999710468}
-  kartNormal: {fileID: 1546988828}
-  kartModel: {fileID: 2076796706}
-  carOffset: 0.7
   maxSpeed: 45
   acceleration: 12
   groundSteering: 15
   airSteering: 25
   gravity: 25
-  wheelRotationMult: 30
   jumpForce: 2000
+  raycastDistance: 0.3
+  driftAngle: 0.4
+  driftBaseSteering: 10
+  driftMaxSteering: 15
+  driftMinSteering: 7
+  wheelsRotationAmount: 25
+  carOffset: 0.7
+  wheelRotationMult: 30
+  kartNormal: {fileID: 1546988828}
+  kartModel: {fileID: 2076796706}
   frontLeftWheel: {fileID: 1967661106}
   frontLeftWheelPivot: {fileID: 937781214}
   frontRightWheel: {fileID: 1726680618}
   frontRightWheelPivot: {fileID: 2027037879}
   backLeftWheel: {fileID: 1052026161}
   backRightWheel: {fileID: 2121594739}
-  wheelsRotationAmount: 25
-  driftAngle: 0.5
-  raycastDistance: 0.5
   speedCounter: {fileID: 1971690113}
 --- !u!1 &1546988827
 GameObject:

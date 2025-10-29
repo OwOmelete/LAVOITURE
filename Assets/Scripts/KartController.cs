@@ -27,31 +27,43 @@ public class KartController : MonoBehaviour
     }
     
 
-    public Transform kartNormal;
-    public Transform kartModel;
-    public float carOffset;
+    [Header("Controls")]
+    
     public float maxSpeed = 30f;
     public float acceleration = 12f;
+    
     public float groundSteering = 80f;
     public float airSteering = 80f;
+    
     public float gravity = 10f;
+    [SerializeField] private float jumpForce = 1;
+    [SerializeField] private float raycastDistance;
+    
+    [Header("Drift")]
+    
+    [SerializeField] private float driftAngle;
+    [SerializeField] private float driftBaseSteering;
+    [SerializeField] private float driftMaxSteering;
+    [SerializeField] private float driftMinSteering;
+    
+    
+    [Header("visuals")]
+    
+    [SerializeField] private float wheelsRotationAmount;
+    public float carOffset;
     public float wheelRotationMult = 1;
 
-    [SerializeField] private float jumpForce = 1;
-
+    [Header("references")]
+    
+    public Transform kartNormal;
+    public Transform kartModel;
     [SerializeField] private GameObject frontLeftWheel;
     [SerializeField] private GameObject frontLeftWheelPivot;
     [SerializeField] private GameObject frontRightWheel;
     [SerializeField] private GameObject frontRightWheelPivot;
     [SerializeField] private GameObject backLeftWheel;
     [SerializeField] private GameObject backRightWheel;
-    [SerializeField] private float wheelsRotationAmount;
-    [SerializeField] private float driftAngle;
-
-    [SerializeField] private float raycastDistance;
     [SerializeField] private TMP_Text speedCounter;
-
-    // Update is called once per frame
 
     private void Start()
     {
@@ -72,18 +84,6 @@ public class KartController : MonoBehaviour
             float dir = Input.GetAxisRaw("Horizontal");
             sphere.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             airSpin = 70f * dir;
-            if (dir < 0)
-            {
-                currentDriftDir = driftDir.left;
-            }
-            else if (dir > 0)
-            {
-                currentDriftDir = driftDir.right;
-            }
-            else
-            {
-                currentDriftDir = driftDir.none;
-            }
 
             canDrift = true;
         }
@@ -94,15 +94,8 @@ public class KartController : MonoBehaviour
             isDrifting = false;
         }
         
-        if (Input.GetAxisRaw("Horizontal") != 0)
-        {
-            int dir = Input.GetAxisRaw("Horizontal") > 0 ? 1 : -1;
-            float amount = Mathf.Abs((Input.GetAxisRaw("Horizontal")));
-            Steer(dir, amount);
-            
-            
-        }
-
+        Steering();
+        
         currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * acceleration);
         speed = 0f;
         currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 4f);
@@ -138,6 +131,20 @@ public class KartController : MonoBehaviour
                 startDrift = false;
                 canDrift = false;
                 isDrifting = true;
+
+                float dir = Input.GetAxisRaw("Horizontal");
+                if (dir < 0)
+                {
+                    currentDriftDir = driftDir.left;
+                }
+                else if (dir > 0)
+                {
+                    currentDriftDir = driftDir.right;
+                }
+                else
+                {
+                    currentDriftDir = driftDir.none;
+                }
             }
             steering = groundSteering;
 
@@ -231,8 +238,42 @@ public class KartController : MonoBehaviour
         //wheel.transform.localRotation = Quaternion.Euler(wheel.transform.localRotation.x + sphere.linearVelocity.magnitude * wheelRotationMult,wheel.transform.localRotation.y, wheel.transform.localRotation.z );
     }
 
-    void Steer(int direction, float amount)
+    void Steering()
     {
-        rotate = (direction * steering) * amount;
+        int dir = Input.GetAxisRaw("Horizontal") > 0 ? 1 : -1;
+        float amount = Mathf.Abs(Input.GetAxisRaw("Horizontal"));
+
+        if (isDrifting)
+        {
+            if (currentDriftDir == driftDir.left)
+            {
+                if (dir < 0)
+                {
+                    rotate = dir * driftMaxSteering * amount - driftBaseSteering;
+                }
+                else
+                {
+                    rotate = dir * driftMinSteering * amount - driftBaseSteering;
+                }
+                    
+            }
+            else
+            {
+                if (dir > 0)
+                {
+                    rotate = dir * driftMaxSteering * amount + driftBaseSteering;
+                }
+                else
+                {
+                    rotate = dir * driftMinSteering * amount + driftBaseSteering;
+                }
+            }
+        }
+        else
+        {
+            rotate = (dir * steering) * amount;
+        }
     }
+
+
 }
