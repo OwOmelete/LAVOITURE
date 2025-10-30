@@ -18,6 +18,7 @@ public class KartController : MonoBehaviour
     private bool isDrifting;
     private bool startDrift;
     private driftDir currentDriftDir;
+    private bool isBoosting;
 
     enum driftDir
     {
@@ -30,6 +31,8 @@ public class KartController : MonoBehaviour
     [Header("Controls")]
     
     public float maxSpeed = 30f;
+    public float boostSpeed = 60f;
+    public float boostImpulse = 60f;
     public float acceleration = 12f;
     
     public float groundSteering = 80f;
@@ -76,9 +79,28 @@ public class KartController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.W))
         {
-            speed = maxSpeed;
+            if (isBoosting)
+            {
+                speed = boostSpeed;
+            }
+            else
+            {
+                speed = maxSpeed;
+                
+            }
         }
 
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            isBoosting = true;
+            Boost();
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            isBoosting = false;
+        }
+        
         if (Input.GetKeyDown(KeyCode.Space) && OnGround)
         {
             float dir = Input.GetAxisRaw("Horizontal");
@@ -91,6 +113,10 @@ public class KartController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             canDrift = false;
+            if (isDrifting)
+            {
+                Boost();
+            }
             isDrifting = false;
         }
         
@@ -273,6 +299,11 @@ public class KartController : MonoBehaviour
         {
             rotate = (dir * steering) * amount;
         }
+    }
+
+    void Boost()
+    {
+        sphere.AddForce(kartModel.transform.forward * boostImpulse, ForceMode.Impulse);
     }
 
 
